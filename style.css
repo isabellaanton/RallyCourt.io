@@ -1,0 +1,230 @@
+/* ============================================================
+   Tennis RPG — Estilos
+   Desenvolvido por Claude (Anthropic) — 2025
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --surface-color: #1a5c8b;
+  --card-bg: rgba(15,23,42,0.90);
+  --card-border: rgba(255,255,255,0.08);
+  --gold: #f59e0b;
+}
+
+body.surface-clay  { --surface-color: #8B3A0F; }
+body.surface-grass { --surface-color: #1a5e12; }
+body.surface-hard  { --surface-color: #1a5c8b; }
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #080c14;
+  color: #e2e8f0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Background ─────────────────────────────────────────────── */
+.court-bg {
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(26,92,139,0.15) 0%, transparent 60%),
+              linear-gradient(180deg, #080c14 0%, #0d1526 100%);
+}
+.court-bg::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image: linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Fonts ──────────────────────────────────────────────────── */
+.font-display { font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em; }
+.font-mono    { font-family:'JetBrains Mono',monospace; }
+
+/* ── Scoreboard ─────────────────────────────────────────────── */
+#scoreboard {
+  background: linear-gradient(135deg,#0f172a 0%,#1e293b 100%);
+  border-bottom: 2px solid var(--surface-color);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+  position: sticky; top:0; z-index:50;
+  transition: border-color 0.5s ease;
+}
+.player-name-score { font-family:'Bebas Neue',sans-serif; letter-spacing:0.06em; font-size:1rem; }
+.set-score { font-family:'JetBrains Mono',monospace; font-weight:600; font-size:0.8rem;
+             background:rgba(255,255,255,0.06); border-radius:4px; padding:2px 6px; }
+.current-score { font-family:'Bebas Neue',sans-serif; font-size:2rem; line-height:1;
+                 min-width:52px; text-align:center; color:var(--gold);
+                 text-shadow:0 0 20px rgba(245,158,11,0.35); }
+
+/* ── Bars ───────────────────────────────────────────────────── */
+.bar-track { background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; height:5px; }
+.bar-fill  { height:100%; border-radius:99px; transition:width 0.5s cubic-bezier(0.4,0,0.2,1); }
+.bar-energy { background:linear-gradient(90deg,#16a34a,#4ade80); }
+.bar-conf   { background:linear-gradient(90deg,#2563eb,#60a5fa); }
+
+/* ── Battle field ───────────────────────────────────────────── */
+#battle-field {
+  background:linear-gradient(180deg,#0d1a2e 0%,#091220 100%);
+  border:1px solid var(--card-border);
+  border-radius:14px;
+}
+
+/* ── Log ────────────────────────────────────────────────────── */
+#match-log { font-size:0.85rem; line-height:1.6; max-height:280px; overflow-y:auto; scroll-behavior:smooth; }
+#match-log::-webkit-scrollbar { width:3px; }
+#match-log::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12); border-radius:2px; }
+.log-line          { padding:2px 0; animation:fadeSlideIn 0.25s ease-out both; }
+.log-line.log-ace      { color:#a78bfa; font-weight:700; }
+.log-line.log-winner   { color:#fbbf24; font-weight:600; }
+.log-line.log-error    { color:#f87171; }
+.log-line.log-system   { color:#64748b; font-style:italic; }
+.log-line.log-separator{ color:#334155; border-top:1px solid rgba(255,255,255,0.04); margin:5px 0; padding-top:5px; }
+@keyframes fadeSlideIn { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── Shot cards ─────────────────────────────────────────────── */
+#shot-panel {
+  background:linear-gradient(180deg,#0f172a 0%,#080c14 100%);
+  border-top:2px solid var(--surface-color);
+  transition:border-color 0.5s ease;
+}
+.shot-card {
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:12px;
+  cursor:pointer;
+  transition:transform 0.16s cubic-bezier(0.34,1.56,0.64,1),
+             box-shadow 0.16s ease, border-color 0.16s ease;
+  position:relative; overflow:hidden; user-select:none;
+}
+.shot-card::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,0.05) 0%,transparent 50%);
+}
+.shot-card:hover:not(.disabled) {
+  transform:translateY(-4px) scale(1.025);
+  border-color:var(--surface-color);
+  box-shadow:0 8px 24px rgba(0,0,0,0.4),0 0 0 1px var(--surface-color);
+}
+.shot-card:active:not(.disabled) { transform:translateY(-1px) scale(0.99); }
+.shot-card.disabled { opacity:0.35; cursor:not-allowed; filter:grayscale(0.6); }
+.shot-icon  { font-size:1.4rem; line-height:1; }
+.shot-name  { font-family:'Bebas Neue',sans-serif; letter-spacing:0.04em; font-size:0.9rem; }
+.shot-desc  { font-size:0.68rem; color:#64748b; line-height:1.3; }
+.shot-cost  { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#f59e0b;
+              display:flex; align-items:center; gap:2px; }
+.success-pill { font-family:'JetBrains Mono',monospace; font-size:0.68rem; font-weight:600;
+                border-radius:99px; padding:2px 7px; }
+.success-high { background:rgba(34,197,94,0.15);  color:#4ade80; }
+.success-mid  { background:rgba(234,179,8,0.15);   color:#fbbf24; }
+.success-low  { background:rgba(239,68,68,0.15);   color:#f87171; }
+
+/* ── Phase badge ────────────────────────────────────────────── */
+.phase-serve  { background:rgba(168,85,247,0.15); border-color:#a855f7; color:#d8b4fe; }
+.phase-rally  { background:rgba(34,197,94,0.12);  border-color:#22c55e; color:#86efac; }
+.phase-net    { background:rgba(239,68,68,0.15);  border-color:#ef4444; color:#fca5a5; }
+.phase-end    { background:rgba(245,158,11,0.15); border-color:#f59e0b; color:#fde68a; }
+
+/* ── Serve dot ──────────────────────────────────────────────── */
+.serve-dot { width:8px;height:8px;border-radius:50%;background:#f59e0b;
+             box-shadow:0 0 6px #f59e0b;display:inline-block;
+             animation:servePulse 1.5s ease-in-out infinite; }
+@keyframes servePulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.65)} }
+
+/* ── AI thinking ────────────────────────────────────────────── */
+.ai-thinking { display:flex;align-items:center;gap:8px;color:#64748b;font-size:0.85rem; }
+.ai-dot { width:7px;height:7px;border-radius:50%;background:#3b82f6;
+          animation:aiPulse 1.2s ease-in-out infinite; }
+.ai-dot:nth-child(2){animation-delay:0.2s} .ai-dot:nth-child(3){animation-delay:0.4s}
+@keyframes aiPulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+/* ── Modal ──────────────────────────────────────────────────── */
+.modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.8);
+                 backdrop-filter:blur(8px);z-index:100;
+                 display:flex;align-items:center;justify-content:center;padding:1rem; }
+.modal-box { background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:18px;
+             width:100%;box-shadow:0 25px 60px rgba(0,0,0,0.7);
+             animation:modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1); overflow:hidden; }
+@keyframes modalIn { from{opacity:0;transform:scale(0.88) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+/* ── Player select cards ─────────────────────────────────────── */
+.player-select-card {
+  background:rgba(255,255,255,0.04);
+  border:2px solid rgba(255,255,255,0.07);
+  border-radius:12px;
+  padding:12px 10px;
+  cursor:pointer;
+  transition:transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  text-align:center;
+}
+.player-select-card:hover { transform:translateY(-3px); border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.07); }
+.player-select-card.selected { border-color:var(--gold); background:rgba(245,158,11,0.1); }
+.player-card-name { font-family:'Bebas Neue',sans-serif; font-size:1rem; letter-spacing:0.04em;
+                    color:#f1f5f9; margin:4px 0 2px; }
+.player-card-style { font-size:0.65rem; color:#64748b; line-height:1.3; margin-bottom:6px; min-height:2.4em; }
+.player-card-attrs { display:flex; flex-wrap:wrap; justify-content:center; gap:4px;
+                     font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#94a3b8; }
+.player-card-attrs span { background:rgba(255,255,255,0.05); padding:1px 5px; border-radius:4px; }
+
+/* ── Tabs ───────────────────────────────────────────────────── */
+.tab-btn { padding:6px 14px; border-radius:6px; font-size:0.8rem; font-weight:600;
+           border:none; cursor:pointer; transition:background 0.15s, color 0.15s; }
+.tab-btn.active { background:var(--surface-color); color:#fff; }
+.tab-btn:not(.active) { background:rgba(255,255,255,0.05); color:#64748b; }
+
+/* ── Surface selector ───────────────────────────────────────── */
+.surface-btn { border:2px solid transparent; border-radius:10px; cursor:pointer;
+               transition:border-color 0.15s,transform 0.15s; padding:10px;
+               background:rgba(255,255,255,0.04); text-align:center; }
+.surface-btn:hover  { transform:scale(1.04); border-color:rgba(255,255,255,0.18); }
+.surface-btn.active { border-color:var(--gold); background:rgba(245,158,11,0.08); }
+
+/* ── CTA buttons ────────────────────────────────────────────── */
+.btn-cta {
+  font-family:'Bebas Neue',sans-serif; letter-spacing:0.08em; font-size:1.1rem;
+  padding:13px 28px; border-radius:10px; border:none; cursor:pointer;
+  background:linear-gradient(135deg,#f59e0b,#d97706); color:#000;
+  box-shadow:0 4px 16px rgba(245,158,11,0.35); transition:transform 0.14s,box-shadow 0.14s;
+  display:inline-block; width:100%;
+}
+.btn-cta:hover   { transform:translateY(-2px); box-shadow:0 8px 24px rgba(245,158,11,0.5); }
+.btn-cta:active  { transform:translateY(0); }
+.btn-cta:disabled,.btn-cta.opacity-30 { opacity:0.35; cursor:not-allowed; pointer-events:none; }
+
+/* ── Input ──────────────────────────────────────────────────── */
+.rpg-input {
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+  color:#f1f5f9; border-radius:8px; padding:10px 14px; font-size:1rem; width:100%;
+  transition:border-color 0.15s;
+}
+.rpg-input:focus { outline:none; border-color:var(--gold); }
+.rpg-input.border-red-500 { border-color:#ef4444; }
+
+/* ── Match over ─────────────────────────────────────────────── */
+.trophy { font-size:3.5rem; animation:trophyIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes trophyIn { from{transform:scale(0) rotate(-20deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+
+/* ── Stat row ───────────────────────────────────────────────── */
+.stat-row { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center;
+            font-size:0.8rem; padding:4px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.stat-val   { font-family:'JetBrains Mono',monospace; font-weight:600; }
+.stat-label { text-align:center; color:#475569; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.06em; }
+
+/* ── Scrollbar for modal grids ──────────────────────────────── */
+.modal-scroll { overflow-y:auto; max-height:55vh; }
+.modal-scroll::-webkit-scrollbar { width:4px; }
+.modal-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.12); border-radius:2px; }
+
+/* ── Register screen ─────────────────────────────────────────── */
+#modal-register .modal-box { max-width:420px; }
+
+/* ── Select screens ─────────────────────────────────────────── */
+#modal-start .modal-box, #modal-select-opponent .modal-box { max-width:680px; }
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width:640px) {
+  .shot-card { padding:10px 8px !important; }
+  .current-score { font-size:1.5rem; min-width:42px; }
+  #match-log { max-height:180px; }
+  #modal-start .modal-box, #modal-select-opponent .modal-box { max-width:100%; }
+}
