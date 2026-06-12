@@ -1,6 +1,5 @@
 // ============================================================
-//  Tennis RPG — Game Engine
-//  Desenvolvido por Claude (Anthropic) — 2025
+//  Rally.io — Game Engine
 //  Depende de: players.js (carregado antes)
 // ============================================================
 
@@ -23,11 +22,10 @@ const OUTCOMES = {
 
 // ─── CATÁLOGO DE GOLPES ───────────────────────────────────────
 const SHOTS = {
-  // ── Saque ──────────────────────────────────────────────────
   serve_flat: {
     id: 'serve_flat', name: 'Saque Flat', phase: 'serve',
     energyCost: 8, baseRisk: 18, power: 95,
-    icon: '⚡', description: 'Veloz, direto, arriscado',
+    icon: 'F', description: 'Veloz, direto, arriscado',
     attr: 'serve', defAttr: 'return',
     narrative: (atk) => [
       `${atk} saca FLAT com força máxima!`,
@@ -37,7 +35,7 @@ const SHOTS = {
   serve_slice: {
     id: 'serve_slice', name: 'Saque Slice', phase: 'serve',
     energyCost: 6, baseRisk: 10, power: 75,
-    icon: '🔄', description: 'Abre a quadra, efeito lateral',
+    icon: 'S', description: 'Abre a quadra, efeito lateral',
     attr: 'serve', defAttr: 'return',
     narrative: (atk) => [
       `${atk} saca com slice!`,
@@ -47,7 +45,7 @@ const SHOTS = {
   serve_kick: {
     id: 'serve_kick', name: 'Saque Kick', phase: 'serve',
     energyCost: 5, baseRisk: 7, power: 65,
-    icon: '🎯', description: 'Seguro, quica alto',
+    icon: 'K', description: 'Seguro, quica alto',
     attr: 'serve', defAttr: 'return',
     narrative: (atk) => [
       `${atk} opta pelo kick — segurança primeiro.`,
@@ -55,11 +53,10 @@ const SHOTS = {
     ],
   },
 
-  // ── Rali ───────────────────────────────────────────────────
   rally_regular: {
     id: 'rally_regular', name: 'Troca Regular', phase: 'rally',
     energyCost: 4, baseRisk: 5, power: 60,
-    icon: '↔️', description: 'Consistente, constrói o ponto',
+    icon: 'R', description: 'Consistente, constrói o ponto',
     attr: 'forehand', defAttr: 'forehand',
     narrative: (atk) => [
       `${atk} mantém a bola em jogo, aguardando oportunidade...`,
@@ -68,7 +65,7 @@ const SHOTS = {
   rally_forehand_winner: {
     id: 'rally_forehand_winner', name: 'Acelerar na Paralela', phase: 'rally',
     energyCost: 12, baseRisk: 28, power: 90,
-    icon: '💥', description: 'Alto risco, alto ganho',
+    icon: 'A', description: 'Alto risco, alto ganho',
     attr: 'forehand', defAttr: 'speed',
     narrative: (atk) => [
       `${atk} vê a abertura e ACELERA na paralela!`,
@@ -78,7 +75,7 @@ const SHOTS = {
   rally_slice_defensive: {
     id: 'rally_slice_defensive', name: 'Slice Defensivo', phase: 'rally',
     energyCost: 3, baseRisk: 6, power: 45,
-    icon: '🛡️', description: 'Diminui o ritmo, recupera posição',
+    icon: 'D', description: 'Diminui o ritmo, recupera posição',
     attr: 'backhand', defAttr: 'forehand',
     narrative: (atk) => [
       `${atk} usa o slice para recuperar posição e respirar.`,
@@ -87,7 +84,7 @@ const SHOTS = {
   rally_approach: {
     id: 'rally_approach', name: 'Subir à Rede', phase: 'rally',
     energyCost: 9, baseRisk: 15, power: 70,
-    icon: '🏃', description: 'Força o oponente a passar',
+    icon: 'N', description: 'Força o oponente a passar',
     attr: 'speed', defAttr: 'forehand',
     narrative: (atk) => [
       `${atk} parte para a rede após o golpe!`,
@@ -95,20 +92,19 @@ const SHOTS = {
     ],
   },
 
-  // ── Rede ───────────────────────────────────────────────────
   net_volley: {
     id: 'net_volley', name: 'Voleio Firme', phase: 'net',
     energyCost: 6, baseRisk: 12, power: 80,
-    icon: '🥊', description: 'Ângulo fechado, finaliza o ponto',
+    icon: 'V', description: 'Angulo fechado, finaliza o ponto',
     attr: 'volley', defAttr: 'speed',
     narrative: (atk) => [
-      `${atk} executa o voleio com precisão cirúrgica!`,
+      `${atk} executa o voleio com precisão!`,
     ],
   },
   net_dropshot: {
     id: 'net_dropshot', name: 'Drop Shot', phase: 'net',
     energyCost: 7, baseRisk: 22, power: 75,
-    icon: '🪄', description: 'Curtinha surpresa, alto risco',
+    icon: 'DS', description: 'Curtinha surpresa, alto risco',
     attr: 'volley', defAttr: 'speed',
     narrative: (atk) => [
       `${atk} tenta a curtinha! Bola morrendo na rede!`,
@@ -117,7 +113,7 @@ const SHOTS = {
   net_smash: {
     id: 'net_smash', name: 'Smash', phase: 'net',
     energyCost: 10, baseRisk: 14, power: 98,
-    icon: '🔥', description: 'Potência máxima acima da cabeça',
+    icon: 'SM', description: 'Potência máxima acima da cabeça',
     attr: 'forehand', defAttr: 'speed',
     narrative: (atk) => [
       `${atk} levanta o braço — vai de SMASH!`,
@@ -132,13 +128,12 @@ class Player {
     this.id         = config.id;
     this.name       = config.name;
     this.fullName   = config.fullName || config.name;
-    this.country    = config.country  || '🎾';
+    this.country    = config.country  || '';
     this.gender     = config.gender   || 'M';
     this.isHuman    = config.isHuman  || false;
     this.playstyle  = config.playstyle || 'all_court';
     this.aiWeights  = config.aiWeights || {};
 
-    // Atributos base (1–99)
     this.serve      = config.serve    || 75;
     this.return     = config.return   || 75;
     this.forehand   = config.forehand || 75;
@@ -148,42 +143,70 @@ class Player {
     this.stamina    = config.stamina  || 75;
     this.mental     = config.mental   || 75;
 
-    // Atributos dinâmicos
+    // Dynamic
     this.energy     = 100;
     this.confidence = 50;
     this.position   = 'baseline'; // baseline | net
 
-    // Estatísticas da partida
+    // Fatigue state levels for UI feedback
+    this.fatigueLevel = 'ok'; // ok | warn | danger | critical
+
     this.stats = { aces: 0, winners: 0, unforcedErrors: 0, forcedErrors: 0 };
   }
 
-  /** Retorna o atributo efetivo aplicando penalidades de fadiga e confiança */
+  /** Effective attribute with fatigue and confidence modifiers */
   effectiveAttr(attrName) {
     const base = this[attrName] || 75;
 
-    // Penalidade de fadiga
+    // Progressive fatigue penalty
     let fatiguePenalty = 0;
-    if (this.energy < 50) fatiguePenalty = (50 - this.energy) * 0.4;
+    if (this.energy < 50) {
+      // Scales from 0 at energy=50 to -20 at energy=0
+      fatiguePenalty = (50 - this.energy) * 0.4;
+    }
 
-    // Bônus/penalidade de confiança (±10 pts máx.)
+    // Confidence bonus (max ±10 pts)
     const confBonus = (this.confidence - 50) * 0.2;
 
     return Math.max(10, Math.min(99, base - fatiguePenalty + confBonus));
   }
 
+  /** Drain energy, capped at 0, update fatigue level */
   drainEnergy(amount) {
     this.energy = Math.max(0, this.energy - amount);
+    this._updateFatigueLevel();
+  }
+
+  _updateFatigueLevel() {
+    if      (this.energy < 15) this.fatigueLevel = 'critical';
+    else if (this.energy < 25) this.fatigueLevel = 'danger';
+    else if (this.energy < 50) this.fatigueLevel = 'warn';
+    else                       this.fatigueLevel = 'ok';
   }
 
   adjustConfidence(delta) {
     this.confidence = Math.max(0, Math.min(100, this.confidence + delta));
   }
 
-  /** Recuperação entre pontos (proporcional à stamina) */
+  /** Recover between points — higher stamina = faster recovery */
   recoverBetweenPoints(surfaceId) {
-    const base      = 8 + (this.stamina - 50) * 0.1;
-    const surfMult  = surfaceId === 'clay' ? 0.8 : surfaceId === 'grass' ? 1.2 : 1.0;
-    this.energy     = Math.min(100, this.energy + base * surfMult);
+    // Base recovery 6–12, scaled by stamina
+    const base     = 6 + (this.stamina - 50) * 0.12;
+    const surfMult = surfaceId === 'clay' ? 0.75 : surfaceId === 'grass' ? 1.3 : 1.0;
+    const gain     = Math.max(2, base * surfMult);
+    this.energy    = Math.min(100, this.energy + gain);
+    this._updateFatigueLevel();
+    return gain;
+  }
+
+  /** Get fatigue penalty description for UI */
+  fatigueDescription() {
+    switch (this.fatigueLevel) {
+      case 'critical': return 'Exausto — risco de erro involuntário';
+      case 'danger':   return 'Muito cansado — atributos muito penalizados';
+      case 'warn':     return 'Cansado — atributos levemente penalizados';
+      default:         return null;
+    }
   }
 
   serialize() {
@@ -195,16 +218,18 @@ class Player {
       backhand: this.backhand, volley: this.volley, speed: this.speed,
       stamina: this.stamina, mental: this.mental,
       energy: this.energy, confidence: this.confidence, position: this.position,
+      fatigueLevel: this.fatigueLevel,
       stats: this.stats,
     };
   }
 
   static deserialize(data) {
     const p = new Player(data);
-    p.energy     = data.energy;
-    p.confidence = data.confidence;
-    p.position   = data.position;
-    p.stats      = data.stats;
+    p.energy       = data.energy;
+    p.confidence   = data.confidence;
+    p.position     = data.position;
+    p.fatigueLevel = data.fatigueLevel || 'ok';
+    p.stats        = data.stats;
     return p;
   }
 }
@@ -316,13 +341,11 @@ class MatchEngine {
     this.humanIndex      = player1.isHuman ? 0 : (player2.isHuman ? 1 : 0);
   }
 
-  // ── Getters ──────────────────────────────────────────────
   get server()   { return this.players[this.score.serving]; }
   get receiver() { return this.players[1 - this.score.serving]; }
 
   get currentActor() {
     if (this.phase === 'serve') return this.server;
-    // Alterna entre server e receiver a cada golpe do rali
     return this.rallyCount % 2 === 0 ? this.server : this.receiver;
   }
 
@@ -332,7 +355,6 @@ class MatchEngine {
            this.phase !== 'point_end';
   }
 
-  // ── Golpes disponíveis ───────────────────────────────────
   availableShots() {
     let pool = [];
     if      (this.phase === 'serve') pool = [SHOTS.serve_flat, SHOTS.serve_slice, SHOTS.serve_kick];
@@ -344,6 +366,7 @@ class MatchEngine {
       ...s,
       successChance: this._estimateSuccess(this.currentActor, s),
       canAfford:     this.currentActor.energy >= s.energyCost,
+      fatigueWarning: this.currentActor.fatigueLevel !== 'ok',
     }));
   }
 
@@ -356,7 +379,6 @@ class MatchEngine {
     return Math.round(Math.min(97, Math.max(20, raw)));
   }
 
-  // ── Resolução probabilística ─────────────────────────────
   _resolveShot(attacker, defender, shot) {
     const atkAttr   = attacker.effectiveAttr(shot.attr);
     const defAttr   = defender.effectiveAttr(shot.defAttr);
@@ -382,7 +404,6 @@ class MatchEngine {
     return OUTCOMES.IN;
   }
 
-  // ── Executa um golpe ─────────────────────────────────────
   executeShot(shotId) {
     if (this.matchOver || this.phase === 'point_end') return null;
 
@@ -392,7 +413,6 @@ class MatchEngine {
     const attacker = this.currentActor;
     const defender = attacker === this.players[0] ? this.players[1] : this.players[0];
     const outcome  = this._resolveShot(attacker, defender, shot);
-    // narrative pode receber (atkName, defName) ou só (atkName)
     const lines    = shot.narrative(attacker.name, defender.name);
 
     let pointWinner = null;
@@ -400,7 +420,7 @@ class MatchEngine {
 
     switch (outcome) {
       case OUTCOMES.ACE:
-        lines.push(`🏆 ACE! Impossível de alcançar! Ponto para ${attacker.name}!`);
+        lines.push(`ACE! Impossível de alcançar! Ponto para ${attacker.name}!`);
         attacker.stats.aces++;
         attacker.stats.winners++;
         pointWinner = attacker;
@@ -408,21 +428,21 @@ class MatchEngine {
         break;
 
       case OUTCOMES.WINNER:
-        lines.push(`🏆 WINNER! ${attacker.name} encerra o ponto em grande estilo!`);
+        lines.push(`WINNER! ${attacker.name} encerra o ponto em grande estilo!`);
         attacker.stats.winners++;
         pointWinner = attacker;
         nextPhase   = 'point_end';
         break;
 
       case OUTCOMES.NET:
-        lines.push(`😬 NA REDE! Erro não-forçado de ${attacker.name}!`);
+        lines.push(`NA REDE! Erro não-forçado de ${attacker.name}.`);
         attacker.stats.unforcedErrors++;
         pointWinner = defender;
         nextPhase   = 'point_end';
         break;
 
       case OUTCOMES.OUT:
-        lines.push(`Out! Bola fora — erro de ${attacker.name}.`);
+        lines.push(`Fora! Bola na linha — erro de ${attacker.name}.`);
         attacker.stats.unforcedErrors++;
         pointWinner = defender;
         nextPhase   = 'point_end';
@@ -431,7 +451,7 @@ class MatchEngine {
       case OUTCOMES.IN:
         if (shot.id === 'rally_approach') {
           attacker.position = 'net';
-          lines.push(`${attacker.name} avança para a rede! Fase de voleio!`);
+          lines.push(`${attacker.name} avança para a rede!`);
           nextPhase = 'net';
         } else if (shot.phase === 'serve') {
           lines.push(`${defender.name} vai devolver...`);
@@ -453,7 +473,6 @@ class MatchEngine {
     this.currentPointLog.push(...lines);
     this.rallyCount++;
 
-    // Ajuste de confiança
     if (pointWinner) {
       pointWinner.adjustConfidence(+8);
       const loser = pointWinner === this.players[0] ? this.players[1] : this.players[0];
@@ -476,9 +495,13 @@ class MatchEngine {
   }
 
   _checkFatigue(attacker, defender) {
-    if (attacker.energy < 15 && Math.random() < 0.35) {
-      attacker.stats.unforcedErrors++;
-      return { winner: defender, msg: `${attacker.name} está exausto! Erro não-forçado!` };
+    // Critical exhaustion: random error, probability rises with tiredness
+    if (attacker.energy < 15) {
+      const errorProb = 0.25 + (15 - attacker.energy) * 0.025;
+      if (Math.random() < errorProb) {
+        attacker.stats.unforcedErrors++;
+        return { winner: defender, msg: `${attacker.name} está exausto! Erro por fadiga extrema!` };
+      }
     }
     return null;
   }
@@ -493,21 +516,30 @@ class MatchEngine {
       this.matchOver = true;
       this.winner    = winner;
       this.phase     = 'match_over';
-      this.matchLog.push(`🏆🏆🏆 ${winner.name} VENCE A PARTIDA! 🏆🏆🏆`);
+      this.matchLog.push(`${winner.name} VENCE A PARTIDA!`);
       return;
     }
-    if (result.setWon)  this.matchLog.push(`── Set conquistado por ${winner.name}! ──`);
+    if (result.setWon)  this.matchLog.push(`Set conquistado por ${winner.name}!`);
     if (result.gameWon) this.matchLog.push(`Game para ${winner.name}!`);
 
-    this.players.forEach(p => p.recoverBetweenPoints(this.surfaceId));
+    // Recovery — each player recovers based on their stamina stat
+    const recoveryMsgs = [];
+    this.players.forEach(p => {
+      const recovered = p.recoverBetweenPoints(this.surfaceId);
+      if (p.fatigueLevel === 'warn' || p.fatigueLevel === 'danger' || p.fatigueLevel === 'critical') {
+        recoveryMsgs.push(`${p.name} recupera +${Math.round(recovered)} ST (total: ${Math.round(p.energy)})`);
+      }
+    });
+    this.matchLog.push(...recoveryMsgs);
+
     this.phase = 'serve';
   }
 
-  // ── IA base (fallback) ───────────────────────────────────
   aiPickShot() {
     const shots = this.availableShots().filter(s => s.canAfford);
     if (!shots.length) return this.availableShots()[0].id;
 
+    // Fatigued AI plays safer
     if (this.currentActor.energy < 25) {
       const safe = shots.find(s => s.baseRisk < 12);
       if (safe) return safe.id;
@@ -523,7 +555,6 @@ class MatchEngine {
     return shots[shots.length - 1].id;
   }
 
-  // ── Persistência ─────────────────────────────────────────
   save() {
     const state = {
       players:         this.players.map(p => p.serialize()),
@@ -539,13 +570,11 @@ class MatchEngine {
     localStorage.setItem('tennisRPG_save', JSON.stringify(state));
   }
 
-  // load sem depender de PLAYER_CONFIGS fixo — usa dados serializados
   static load() {
     const raw = localStorage.getItem('tennisRPG_save');
     if (!raw) return null;
     try {
       const state   = JSON.parse(raw);
-      // Reconstrói players a partir dos dados salvos (inclui aiWeights/playstyle)
       const players = state.players.map(pd => Player.deserialize(pd));
       const engine  = new MatchEngine(players[0], players[1], state.surfaceId);
       engine.score           = ScoreManager.deserialize(state.score);
