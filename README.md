@@ -5,7 +5,7 @@
 
 ## 🎾 Sobre o Projeto
 
-O **Rally.io** é um simulador web tático e imersivo que replica a intensidade e a profundidade estratégica de uma partida de ténis profissional. Desenvolvido para correr diretamente no navegador, o motor do jogo afasta-se dos meros reflexos rápidos (estilo *arcade*) para se focar no verdadeiro âmago do desporto: o **fator psicológico, a gestão física e a escolha de pancadas certas** com base no terreno.
+O **RallyCourt.io** é um simulador web tático e imersivo que replica a intensidade e a profundidade estratégica de uma partida de ténis profissional. Desenvolvido para correr diretamente no navegador, o motor do jogo afasta-se dos meros reflexos rápidos (estilo *arcade*) para se focar no verdadeiro âmago do desporto: o **fator psicológico, a gestão física e a escolha de pancadas certas** com base no terreno.
 
 <div style="margin: 20px 0;">
   <img src="https://img.shields.io/badge/HTML5-Canvas-orange?style=for-the-badge" alt="HTML5">
