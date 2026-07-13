@@ -1,5 +1,5 @@
 <div align="center" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); padding: 40px 20px; border-radius: 16px; border-bottom: 5px solid #ca8a04; margin-bottom: 30px;">
-  <h1 style="font-family: 'Righteous', sans-serif; font-size: 3.5rem; color: #ffffff; margin: 0; letter-spacing: 0.05em;">Rally<span style="color: #fbbf24;">.io</span></h1>
+  <h1 style="font-family: 'Righteous', sans-serif; font-size: 3.5rem; color: #ffffff; margin: 0; letter-spacing: 0.05em;">RallyCourt<span style="color: #fbbf24;">.io</span></h1>
   <p style="font-family: 'Syne', sans-serif; font-size: 1.2rem; color: #e0f2fe; margin-top: 10px; opacity: 0.9;">Web Simulator de Estratégia e Partidas de Ténis</p>
 </div>
 
