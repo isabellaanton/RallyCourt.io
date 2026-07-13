@@ -1,7 +1,3 @@
-/* ============================================================
-   Rally.io — Estilos (Fontes Atualizadas)
-   ============================================================ */
-
 @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&display=swap');
 
 /* ── Tokens ─────────────────────────────────────────────────── */
@@ -101,7 +97,7 @@ body.dark .court-bg {
 .font-display { font-family: 'Righteous', sans-serif; letter-spacing: .02em; }
 .font-mono    { font-family: 'Space Mono', monospace; }
 
-/* ── Rally.io Logo ──────────────────────────────────────────── */
+/* ── RallyCourt.io Logo ─────────────────────────────────────── */
 .rally-logo {
   font-family: 'Righteous', sans-serif;
   font-size: 2.8rem;
@@ -111,12 +107,55 @@ body.dark .court-bg {
 }
 .rally-logo span { color: var(--surface-color); }
 
+/* ── Top navigation bar ─────────────────────────────────────── */
+/* Antes os botões (Escuro / Tutorial / Pausa) eram "position:fixed"
+   flutuando sobre o conteúdo. Em navegadores mobile isso fazia com
+   que a barra de endereço dinâmica cortasse os botões no topo da
+   tela. Agora a barra faz parte do fluxo normal do documento,
+   fica "sticky" no topo e reserva espaço com safe-area-inset-top,
+   então nunca fica cortada nem sobreposta. */
+#top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 70;
+  background: linear-gradient(135deg, var(--surface-color) 0%, #0369a1 100%);
+  box-shadow: 0 2px 12px rgba(0,0,0,.18);
+  padding-top: env(safe-area-inset-top, 0px);
+  transition: background .3s;
+}
+#top-nav-inner {
+  max-width: 1024px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+}
+.top-nav-brand {
+  font-family: 'Righteous', sans-serif;
+  letter-spacing: .02em;
+  font-size: 1.15rem;
+  color: #ffffff;
+  line-height: 1;
+  white-space: nowrap;
+}
+.top-nav-brand span { color: #fbbf24; }
+.top-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 /* ── Scoreboard ─────────────────────────────────────────────── */
 #scoreboard {
   background: var(--scoreboard-bg);
   border-bottom: 3px solid var(--surface-color);
   box-shadow: 0 4px 20px rgba(15,23,42,.06);
-  position: sticky; top:0; z-index:50;
+  position: sticky;
+  top: calc(52px + env(safe-area-inset-top, 0px));
+  z-index: 40;
   transition: border-color .5s, background .3s;
 }
 .player-name-score { font-family: 'Righteous', sans-serif; letter-spacing: .04em; font-size: 1.1rem; color: var(--text-main); }
@@ -407,26 +446,21 @@ body.dark .surface-label-grass { color:#4ade80; }
 #modal-start .modal-box, #modal-select-opponent .modal-box { max-width:700px; }
 #modal-tutorial .modal-box { max-width:520px; }
 
-/* ── Theme toggle + pause + tutorial buttons ────────────────── */
-#btn-theme, #btn-tutorial {
-  height:32px; border-radius:6px; border:1px solid var(--divider);
-  background:var(--surface-btn-bg); cursor:pointer;
+/* ── Theme toggle + pause + tutorial buttons (top-nav) ──────── */
+#btn-theme, #btn-tutorial, #btn-pause {
+  height:32px; border-radius:6px; border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.12); cursor:pointer;
   display:inline-flex;align-items:center;justify-content:center;
-  font-size:.72rem; font-weight:600; color:var(--text-muted);
+  font-size:.72rem; font-weight:600; color:#ffffff;
   padding:0 10px;
   transition:background .2s, border-color .2s, color .15s;
   flex-shrink:0;
+  backdrop-filter: blur(4px);
 }
 #btn-tutorial { width:32px; padding:0; font-size:.85rem; font-weight:700; border-radius:50%; }
-#btn-theme:hover, #btn-tutorial:hover { border-color:var(--surface-color); color:var(--text-main); }
-
-#btn-pause {
-  color:var(--text-muted); font-size:.78rem; padding:5px 12px;
-  border-radius:6px; border:1px solid var(--divider);
-  background:var(--surface-btn-bg); cursor:pointer; font-weight:500;
-  transition:color .15s, border-color .15s, background .2s;
-}
-#btn-pause:hover { color:var(--text-main); border-color:var(--surface-color); }
+#btn-theme:hover, #btn-tutorial:hover, #btn-pause:hover { background:rgba(255,255,255,.24); border-color:#fff; }
+#btn-pause { gap:6px; font-size:.78rem; padding:5px 12px; }
+#btn-pause .pause-icon { font-size:.7rem; letter-spacing:-1px; }
 
 /* ── Pause modal buttons ────────────────────────────────────── */
 .pause-btn-primary {
@@ -472,6 +506,37 @@ body.dark .surface-label-grass { color:#4ade80; }
   box-shadow:0 0 8px rgba(204,255,0,.7);
   transition: top .25s ease-out, left .25s ease-out;
 }
+
+/* ── Racket on player tokens ────────────────────────────────── */
+.token-racket {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 45%;
+  left: 62%;
+  pointer-events: none;
+  z-index: 6;
+  transform-origin: 50% 92%;   /* pivô na base do cabo, tipo "pulso" */
+  transform: rotate(-18deg);
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.5));
+}
+.token-you .token-racket { color: #fbbf24; }
+.token-opp .token-racket { color: #93c5fd; transform: rotate(18deg) scaleX(-1); transform-origin: 50% 92%; }
+
+@keyframes racketSwingYou {
+  0%   { transform: rotate(-18deg); }
+  30%  { transform: rotate(-95deg) translate(-2px,-2px); }
+  55%  { transform: rotate(55deg); }
+  100% { transform: rotate(-18deg); }
+}
+@keyframes racketSwingOpp {
+  0%   { transform: rotate(18deg) scaleX(-1); }
+  30%  { transform: rotate(95deg) translate(2px,-2px) scaleX(-1); }
+  55%  { transform: rotate(-55deg) scaleX(-1); }
+  100% { transform: rotate(18deg) scaleX(-1); }
+}
+.token-you .token-racket.swing { animation: racketSwingYou 380ms cubic-bezier(.25,.9,.3,1.15); }
+.token-opp .token-racket.swing { animation: racketSwingOpp 380ms cubic-bezier(.25,.9,.3,1.15); }
 
 /* ── Action feedback flash ──────────────────────────────────── */
 @keyframes hitFlash { 0%{opacity:1;transform:scale(1.3)} 100%{opacity:0;transform:scale(2)} }

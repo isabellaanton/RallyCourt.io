@@ -1,5 +1,5 @@
 /**
- * Rally.io — Court Renderer (Tamanho ajustado conforme solicitado)
+ * RallyCourt.io — Court Renderer (Tamanho ajustado )
  */
 
 const CourtRenderer = (() => {
@@ -176,9 +176,9 @@ const CourtRenderer = (() => {
     ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.textAlign = 'center';
     const labelOpp = project(0, 0, -COURT_HALF_LENGTH - 0.6);
-    if (labelOpp.visible) ctx.fillText('OPONENTE', labelOpp.x, labelOpp.y);
+    if (labelOpp.visible) ctx.fillText(typeof t === 'function' ? t('court.opponent') : 'OPONENTE', labelOpp.x, labelOpp.y);
     const labelYou = project(0, 0, COURT_HALF_LENGTH + 0.6);
-    if (labelYou.visible) ctx.fillText('VOCÊ', labelYou.x, labelYou.y);
+    if (labelYou.visible) ctx.fillText(typeof t === 'function' ? t('court.you') : 'VOCÊ', labelYou.x, labelYou.y);
     ctx.restore();
 
     const vig = ctx.createRadialGradient(W / 2, H * 0.48, H * 0.08, W / 2, H * 0.52, H * 0.7);

@@ -1,90 +1,102 @@
 // ============================================================
-//  Rally.io — Game Engine (VERSÃO MELHORADA 2026)
+//  RallyCourt.io — Game Engine (VERSÃO MELHORADA 2026)
 //  IA inteligente + balanceamento refinado + narrativas ricas
+//  Totalmente internacionalizado (PT / EN / FR) via translations.js
 // ============================================================
 
 const SURFACES = {
-  clay:  { name: 'Saibro',        energyMult: 1.35, serveBonus: 0,  netBonus: -8,  rallyMult: 1.25 },
-  grass: { name: 'Grama',         energyMult: 0.75, serveBonus: 12, netBonus: 12, rallyMult: 0.65 },
-  hard:  { name: 'Quadra Rápida', energyMult: 1.0,  serveBonus: 6,  netBonus: 0,  rallyMult: 1.0 },
+  clay:  { get name() { return t('surfaces.clay.name'); },  energyMult: 1.35, serveBonus: 0,  netBonus: -8,  rallyMult: 1.25 },
+  grass: { get name() { return t('surfaces.grass.name'); }, energyMult: 0.75, serveBonus: 12, netBonus: 12, rallyMult: 0.65 },
+  hard:  { get name() { return t('surfaces.hard.name'); },  energyMult: 1.0,  serveBonus: 6,  netBonus: 0,  rallyMult: 1.0 },
 };
 
 const OUTCOMES = {
   IN: 'in', OUT: 'out', NET: 'net', WINNER: 'winner', ACE: 'ace', FORCED_ERROR: 'forced_error'
 };
 
+// Nomes, descrições e narrativas são resolvidos em tempo real via t(),
+// para que a troca de idioma (PT/EN/FR) reflita imediatamente em tudo,
+// inclusive golpes já definidos aqui como objetos estáticos.
+function shotNarrative(shotId, atkName) {
+  const lines = [t(`shots.${shotId}.n1`, { name: atkName })];
+  const n2 = t(`shots.${shotId}.n2`, { name: atkName });
+  // Se a chave n2 não existir, t() retorna a própria chave — nesse caso ignoramos.
+  if (n2 && n2 !== `shots.${shotId}.n2`) lines.push(n2);
+  return lines;
+}
+
 const SHOTS = {
   serve_flat: {
-    id: 'serve_flat', name: 'Saque Flat', phase: 'serve',
+    id: 'serve_flat', get name() { return t('shots.serve_flat.name'); }, phase: 'serve',
     energyCost: 8, baseRisk: 16, power: 96, icon: 'F',
-    desc: 'Alta potência, alto risco.',
+    get desc() { return t('shots.serve_flat.desc'); },
     attr: 'serve', defAttr: 'return',
-    narrative: (atk) => [`${atk} solta um saque FLAT devastador!`, `A bola voa a mais de 210 km/h!`]
+    narrative: (atk) => shotNarrative('serve_flat', atk)
   },
   serve_slice: {
-    id: 'serve_slice', name: 'Saque Slice', phase: 'serve',
+    id: 'serve_slice', get name() { return t('shots.serve_slice.name'); }, phase: 'serve',
     energyCost: 6, baseRisk: 9, power: 78, icon: 'S',
-    desc: 'Efeito lateral, risco moderado.',
+    get desc() { return t('shots.serve_slice.desc'); },
     attr: 'serve', defAttr: 'return',
-    narrative: (atk) => [`${atk} usa slice para abrir a quadra.`, `Efeito lateral perigoso!`]
+    narrative: (atk) => shotNarrative('serve_slice', atk)
   },
   serve_kick: {
-    id: 'serve_kick', name: 'Saque Kick', phase: 'serve',
+    id: 'serve_kick', get name() { return t('shots.serve_kick.name'); }, phase: 'serve',
     energyCost: 5, baseRisk: 6, power: 68, icon: 'K',
-    desc: 'Seguro, quica alto.',
+    get desc() { return t('shots.serve_kick.desc'); },
     attr: 'serve', defAttr: 'return',
-    narrative: (atk) => [`${atk} opta pelo kick seguro.`, `Quica alto e difícil de atacar.`]
+    narrative: (atk) => shotNarrative('serve_kick', atk)
   },
 
   rally_regular: {
-    id: 'rally_regular', name: 'Troca Regular', phase: 'rally',
+    id: 'rally_regular', get name() { return t('shots.rally_regular.name'); }, phase: 'rally',
     energyCost: 4, baseRisk: 4, power: 62, icon: 'R',
-    desc: 'Golpe consistente e seguro.',
+    get desc() { return t('shots.rally_regular.desc'); },
     attr: 'forehand', defAttr: 'forehand',
-    narrative: (atk) => [`${atk} mantém o ponto com consistência.`]
+    narrative: (atk) => shotNarrative('rally_regular', atk)
   },
   rally_forehand_winner: {
-    id: 'rally_forehand_winner', name: 'Acelerar na Paralela', phase: 'rally',
+    id: 'rally_forehand_winner', get name() { return t('shots.rally_forehand_winner.name'); }, phase: 'rally',
     energyCost: 11, baseRisk: 25, power: 92, icon: 'A',
-    desc: 'Agressivo, tenta encerrar o ponto.',
+    get desc() { return t('shots.rally_forehand_winner.desc'); },
     attr: 'forehand', defAttr: 'speed',
-    narrative: (atk) => [`${atk} acelera na paralela!`, `Golpe agressivo tentando encerrar o ponto!`]
+    narrative: (atk) => shotNarrative('rally_forehand_winner', atk)
   },
   rally_slice_defensive: {
-    id: 'rally_slice_defensive', name: 'Slice Defensivo', phase: 'rally',
+    id: 'rally_slice_defensive', get name() { return t('shots.rally_slice_defensive.name'); }, phase: 'rally',
     energyCost: 3, baseRisk: 5, power: 48, icon: 'D',
-    desc: 'Defensivo, recupera posição.',
+    get desc() { return t('shots.rally_slice_defensive.desc'); },
     attr: 'backhand', defAttr: 'forehand',
-    narrative: (atk) => [`${atk} usa slice defensivo para recuperar posição.`]
+    narrative: (atk) => shotNarrative('rally_slice_defensive', atk)
   },
   rally_approach: {
-    id: 'rally_approach', name: 'Subir à Rede', phase: 'rally',
+    id: 'rally_approach', get name() { return t('shots.rally_approach.name'); }, phase: 'rally',
     energyCost: 9, baseRisk: 14, power: 72, icon: 'N',
-    desc: 'Avança para a rede.',
+    get desc() { return t('shots.rally_approach.desc'); },
     attr: 'speed', defAttr: 'forehand',
-    narrative: (atk) => [`${atk} avança para a rede após o golpe!`]
+    narrative: (atk) => shotNarrative('rally_approach', atk)
   },
 
   net_volley: {
-    id: 'net_volley', name: 'Voleio Firme', phase: 'net',
+    id: 'net_volley', get name() { return t('shots.net_volley.name'); }, phase: 'net',
     energyCost: 6, baseRisk: 11, power: 82, icon: 'V',
-    desc: 'Voleio firme e preciso.',
+    get desc() { return t('shots.net_volley.desc'); },
     attr: 'volley', defAttr: 'speed',
-    narrative: (atk) => [`${atk} executa um voleio preciso!`]
+    narrative: (atk) => shotNarrative('net_volley', atk)
   },
   net_dropshot: {
-    id: 'net_dropshot', name: 'Drop Shot', phase: 'net',
+    id: 'net_dropshot', get name() { return t('shots.net_dropshot.name'); }, phase: 'net',
     energyCost: 7, baseRisk: 20, power: 76, icon: 'DS',
-    desc: 'Bola curta e surpresa.',
+    get desc() { return t('shots.net_dropshot.desc'); },
     attr: 'volley', defAttr: 'speed',
-    narrative: (atk) => [`${atk} tenta o drop shot surpresa!`, `Bola morrendo na rede!`]
+    narrative: (atk) => shotNarrative('net_dropshot', atk)
   },
   net_smash: {
-    id: 'net_smash', name: 'Smash', phase: 'net',
+    id: 'net_smash', get name() { return t('shots.net_smash.name'); }, phase: 'net',
     energyCost: 10, baseRisk: 13, power: 98, icon: 'SM',
-    desc: 'Potência máxima na rede.',
+    get desc() { return t('shots.net_smash.desc'); },
     attr: 'forehand', defAttr: 'speed',
-    narrative: (atk) => [`${atk} vai de SMASH!`, `Potência máxima acima da cabeça!`]
+    narrative: (atk) => shotNarrative('net_smash', atk)
   },
 };
 
@@ -182,7 +194,7 @@ class ScoreManager { /* Mantido igual ao original (funcionalidade preservada) */
   get pointDisplay() { /* mesmo código original */ 
     const [p1, p2] = this.points;
     if (this.inTiebreak) return [`${p1}`, `${p2}`];
-    if (p1 >= 3 && p2 >= 3) return p1 === p2 ? ['Deuce', 'Deuce'] : p1 > p2 ? ['Vant.', ''] : ['', 'Vant.'];
+    if (p1 >= 3 && p2 >= 3) return p1 === p2 ? [t('outcomes.deuce'), t('outcomes.deuce')] : p1 > p2 ? [t('outcomes.advantage'), ''] : ['', t('outcomes.advantage')];
     return [ScoreManager.POINT_NAMES[p1] ?? '0', ScoreManager.POINT_NAMES[p2] ?? '0'];
   }
   awardPoint(playerIndex) { /* mesmo código original */ 
@@ -292,29 +304,29 @@ class MatchEngine {
 
     switch (outcome) {
       case OUTCOMES.ACE:
-        lines.push(`ACE! Ponto direto para ${attacker.name}!`);
+        lines.push(t('outcomes.ace', { name: attacker.name }));
         attacker.stats.aces++; attacker.stats.winners++;
         pointWinner = attacker; nextPhase = 'point_end';
         break;
       case OUTCOMES.WINNER:
-        lines.push(`WINNER! ${attacker.name} encerra o ponto com maestria!`);
+        lines.push(t('outcomes.winner', { name: attacker.name }));
         attacker.stats.winners++;
         pointWinner = attacker; nextPhase = 'point_end';
         break;
       case OUTCOMES.NET:
       case OUTCOMES.OUT:
-        lines.push(outcome === OUTCOMES.NET ? `Na rede! Erro de ${attacker.name}.` : `Fora! Erro de ${attacker.name}.`);
+        lines.push(outcome === OUTCOMES.NET ? t('outcomes.net', { name: attacker.name }) : t('outcomes.out', { name: attacker.name }));
         attacker.stats.unforcedErrors++;
         pointWinner = defender; nextPhase = 'point_end';
         break;
       case OUTCOMES.FORCED_ERROR:
-        lines.push(`Erro forçado! ${defender.name} pressionou demais.`);
+        lines.push(t('outcomes.forcedError', { name: defender.name }));
         pointWinner = defender; nextPhase = 'point_end';
         break;
       case OUTCOMES.IN:
         if (shot.id === 'rally_approach') {
           attacker.position = 'net';
-          lines.push(`${attacker.name} sobe à rede!`);
+          lines.push(t('outcomes.climbsToNet', { name: attacker.name }));
           nextPhase = 'net';
         } else if (shot.phase === 'serve') {
           nextPhase = 'rally';
@@ -360,16 +372,16 @@ class MatchEngine {
       this.matchOver = true;
       this.winner = winner;
       this.phase = 'match_over';
-      this.currentPointLog.push(`${winner.name} VENCE A PARTIDA!`);
+      this.currentPointLog.push(t('outcomes.matchWin', { name: winner.name }));
       this.matchLog.push(...this.currentPointLog);
       return;
     }
-    if (result.setWon) this.currentPointLog.push(`Set para ${winner.name}!`);
-    if (result.gameWon) this.currentPointLog.push(`Game para ${winner.name}!`);
+    if (result.setWon) this.currentPointLog.push(t('outcomes.setFor', { name: winner.name }));
+    if (result.gameWon) this.currentPointLog.push(t('outcomes.gameFor', { name: winner.name }));
 
     this.players.forEach(p => {
       const recovered = p.recoverBetweenPoints(this.surfaceId);
-      if (p.fatigueLevel !== 'ok') this.currentPointLog.push(`${p.name} recupera +${Math.round(recovered)} ST`);
+      if (p.fatigueLevel !== 'ok') this.currentPointLog.push(t('outcomes.recovers', { name: p.name, amount: Math.round(recovered) }));
     });
 
     this.matchLog.push(...this.currentPointLog);

@@ -1,8 +1,3 @@
-// ============================================================
-//  Rally.io — UI Controller (MELHORADO)
-//  Animações mais fluidas + feedback melhor
-// ============================================================
-
 let engine = null;
 let playerName = '';
 let selectedPlayerCfg = null;
@@ -11,21 +6,28 @@ let selectedSurface = 'hard';
 let gamePaused = false;
 
 // Language
-window.setLanguage = function(lang) {
-  if (TRANSLATIONS[lang]) {
-    currentLang = lang;
-    localStorage.setItem('tennisRPG_lang', lang);
-    updateAllTexts();
-    const sel = document.getElementById('lang-select');
-    if (sel) sel.value = lang;
+// setLanguage()/t()/updateAllTexts() vêm de translations.js.
+// Aqui só precisamos garantir que, ao trocar de idioma, tudo que é
+// dinâmico (cards de golpe, nomes de superfície na tela de seleção,
+// labels do placar, etc.) seja recalculado também.
+function onLanguageChanged() {
+  applyTheme(document.body.classList.contains('dark')); // atualiza texto do botão de tema
+  const tutorialBtn = document.getElementById('btn-tutorial');
+  if (tutorialBtn) tutorialBtn.title = t('nav.tutorial');
+  if (engine) { updateUI(); redrawCourt(); }
+  if (document.getElementById('modal-start') && !document.getElementById('modal-start').classList.contains('hidden')) {
+    renderPlayerSelectGrid();
   }
-};
+  if (document.getElementById('modal-select-opponent') && !document.getElementById('modal-select-opponent').classList.contains('hidden')) {
+    renderOpponentGrid();
+  }
+}
 
 // Theme
 function applyTheme(dark) {
   document.body.classList.toggle('dark', dark);
   const btn = document.getElementById('btn-theme');
-  if (btn) btn.textContent = dark ? 'Claro' : 'Escuro';
+  if (btn) btn.textContent = dark ? t('nav.themeLight') : t('nav.themeDark');
   localStorage.setItem('tennisRPG_theme', dark ? 'dark' : 'light');
 }
 
@@ -47,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-close-tutorial')?.addEventListener('click', () => hideModal('modal-tutorial'));
 
   updateAllTexts();
+  const tutorialBtn = document.getElementById('btn-tutorial');
+  if (tutorialBtn) tutorialBtn.title = t('nav.tutorial');
 
   const saved = MatchEngine.load();
   if (saved && !saved.matchOver) {
@@ -63,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (engine.server === human) showCards();
         else triggerAITurn();
       }
-      addLog(`Bem-vindo de volta, ${playerName}!`, 'system');
+      addLog(t('misc.welcomeBack', { name: playerName }), 'system');
       return;
     }
   }
@@ -90,7 +94,7 @@ document.getElementById('input-player-name')?.addEventListener('keydown', e => {
 function prepareMyPlayer() {
   let cfg = JSON.parse(localStorage.getItem('tennisRPG_myPlayer'));
   if (!cfg) {
-    cfg = {id:'myplayer_1', name:playerName, fullName:playerName, country:'🌎', gender:'M', style:'Jogador Customizado',
+    cfg = {id:'myplayer_1', name:playerName, fullName:playerName, country:'🌎', gender:'M', style:t('misc.customStyle'),
       playstyle:'all_court', serve:68, return:68, forehand:70, backhand:66, volley:62, speed:72, stamina:75, mental:68, aiWeights:{}};
     localStorage.setItem('tennisRPG_myPlayer', JSON.stringify(cfg));
   } else {
@@ -122,6 +126,13 @@ function renderPlayerSelectGrid() {
   FEMALE_PLAYERS.forEach(p => gf.appendChild(buildPlayerCard(p, 'player')));
 }
 
+function getPlayerStyleText(p) {
+  if (p.id === 'myplayer_1') return t('misc.customStyle');
+  const translated = t(`players.${p.id}`);
+  // Se não existir tradução para esse id, t() devolve a própria chave — nesse caso usamos o texto original.
+  return (translated && translated !== `players.${p.id}`) ? translated : p.style;
+}
+
 function buildPlayerCard(p, mode) {
   const div = document.createElement('div');
   div.className = 'player-select-card';
@@ -129,7 +140,7 @@ function buildPlayerCard(p, mode) {
   div.innerHTML = `
     <div class="text-base">${p.country}</div>
     <div class="player-card-name">${p.name}</div>
-    <div class="player-card-style">${p.style}</div>
+    <div class="player-card-style">${getPlayerStyleText(p)}</div>
     <div class="player-card-attrs">
       <span>SV ${p.serve}</span><span>FH ${p.forehand}</span><span>VL ${p.speed}</span><span>MT ${p.mental}</span>
     </div>`;
@@ -194,7 +205,7 @@ function startMatch() {
   setSurfaceTheme(selectedSurface);
   hideModal('modal-select-opponent');
   document.getElementById('match-log').innerHTML = '';
-  addLog(`Partida iniciada! ${p1.name} vs ${p2.name}`, 'system');
+  addLog(t('misc.matchStarted', { p1: p1.name, p2: p2.name }), 'system');
   updateUI(); resetTokens(); redrawCourt(); engine.save();
   if (engine.server === engine.players[engine.humanIndex]) showCards();
   else triggerAITurn();
@@ -203,7 +214,7 @@ function startMatch() {
 function updateAIThinkingLabel() {
   const opp = engine.players[1 - engine.humanIndex];
   const lbl = document.getElementById('ai-thinking-label');
-  if (lbl) lbl.textContent = `${opp.name} pensando...`;
+  if (lbl) lbl.textContent = t('misc.aiThinkingName', { name: opp.name });
 }
 
 // Shot Handling
@@ -336,6 +347,17 @@ function spawnHitEffect(tokenId) {
   flash.style.top = token.style.top;
   token.parentElement.appendChild(flash);
   setTimeout(() => flash.remove(), 420);
+
+  swingRacket(token);
+}
+
+function swingRacket(token) {
+  const racket = token.querySelector('.token-racket');
+  if (!racket) return;
+  racket.classList.remove('swing');
+  void racket.offsetWidth; // força reflow p/ permitir re-trigger em golpes seguidos
+  racket.classList.add('swing');
+  setTimeout(() => racket.classList.remove('swing'), 400);
 }
 
 function styleBallForShot(shotId) {
@@ -400,7 +422,7 @@ function showMatchOverScreen() {
   const ai = engine.players[1 - engine.humanIndex];
   const winner = engine.winner;
 
-  document.getElementById('over-winner-name').textContent = winner ? `${winner.name} VENCE!` : '';
+  document.getElementById('over-winner-name').textContent = winner ? t('misc.winnerAnnounce', { name: winner.name }) : '';
 
   const setsText = engine.score.sets.map(s => {
     const humanGames = engine.humanIndex === 0 ? s.p1 : s.p2;
@@ -413,10 +435,10 @@ function showMatchOverScreen() {
   document.getElementById('over-p2-name').textContent = ai.name;
 
   const rows = [
-    ['Aces', human.stats.aces, ai.stats.aces],
-    ['Winners', human.stats.winners, ai.stats.winners],
-    ['Erros não forçados', human.stats.unforcedErrors, ai.stats.unforcedErrors],
-    ['Erros forçados', human.stats.forcedErrors, ai.stats.forcedErrors],
+    [t('stats.aces'), human.stats.aces, ai.stats.aces],
+    [t('stats.winners'), human.stats.winners, ai.stats.winners],
+    [t('stats.unforcedErrors'), human.stats.unforcedErrors, ai.stats.unforcedErrors],
+    [t('stats.forcedErrors'), human.stats.forcedErrors, ai.stats.forcedErrors],
   ];
   const statsBody = document.getElementById('stats-body');
   statsBody.innerHTML = '';

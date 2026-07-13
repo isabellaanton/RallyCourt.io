@@ -1,6 +1,7 @@
 // ============================================================
-//  Tennis RPG — Roster Completo de Jogadores
-//  Desenvolvido por Claude (Anthropic)
+//  RallyCourt.io — Elenco de Jogadores
+//  Os textos de "style" abaixo são o fallback em PT; as traduções
+//  EN/FR de cada jogador ficam em translations.js (chave players.<id>).
 // ============================================================
 
 // ─── JOGADORES MASCULINOS ─────────────────────────────────────
